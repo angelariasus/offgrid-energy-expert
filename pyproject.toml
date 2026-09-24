@@ -1,0 +1,35 @@
+# Metadata centralizada del proyecto + configuración de herramientas de
+# calidad de código (ruff, black).
+#
+# Decisión: se usa `pip` clásico con `requirements.txt`/`requirements-dev.txt`
+# como gestor de dependencias (no Poetry), por simplicidad y compatibilidad
+# directa con el Dockerfile (`pip install -r requirements.txt`) y con el
+# workflow de CI del curso. Este `pyproject.toml` se usa únicamente para
+# declarar metadata mínima del paquete y centralizar la configuración de
+# `ruff`/`black`, no como fuente de verdad de dependencias.
+
+[project]
+name = "offgrid-energy-expert"
+version = "1.0.0"
+description = "Backend del Sistema Experto de Energias Renovables Off-Grid (UNMSM - Sistemas Inteligentes)"
+readme = "README.md"
+requires-python = ">=3.11"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W", "UP", "B"]
+ignore = [
+    "E501",  # el largo de línea lo controla black
+    "B008",  # `Depends(...)` como valor por defecto es el patrón idiomático de FastAPI
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["core", "schemas", "services", "routers"]
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+include = '\.pyi?$'

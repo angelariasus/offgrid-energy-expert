@@ -1,0 +1,6 @@
+# Dependencias adicionales de desarrollo (lint, formateo).
+# No se requieren en la imagen de producción (Dockerfile solo instala requirements.txt).
+-r requirements.txt
+
+ruff>=0.4,<1.0
+black>=24.0,<25.0
