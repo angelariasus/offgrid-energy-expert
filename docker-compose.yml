@@ -16,7 +16,7 @@ services:
   # build una vez que exista el proyecto de frontend.
   # frontend:
   #   build:
-  #     context: ../offgrid-energy-frontend
+  #     context: ../offgrid-energy-expert-frontend
   #     dockerfile: Dockerfile
   #   ports:
   #     - "3000:3000"
