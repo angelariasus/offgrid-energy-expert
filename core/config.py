@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Literal
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -25,8 +26,35 @@ class Settings(BaseSettings):
     clips_rules_path: str = "logica/reglas.clp"
     """Ruta al archivo .clp con las reglas del sistema experto."""
 
-    cors_allowed_origins: list[str] = ["http://localhost:3000"]
-    """Orígenes permitidos por CORS (frontend Next.js/React). Nunca usar ["*"] en prod."""
+    cors_allowed_origins: list[str] | str = ["http://localhost:3000"]
+    """Orígenes permitidos por CORS (acepta lista JSON, string simple, separados por coma o lista)."""
+
+    @field_validator("cors_allowed_origins", mode="after")
+    @classmethod
+    def parse_cors_origins(cls, v: list[str] | str) -> list[str]:
+        """Parsea tolerantemente orígenes CORS desde variables de entorno."""
+        import json
+
+        if isinstance(v, list):
+            return [str(x).strip() for x in v if str(x).strip()]
+        if isinstance(v, str):
+            v = v.strip()
+            if not v:
+                return ["http://localhost:3000"]
+            if v.startswith("[") and v.endswith("]"):
+                try:
+                    parsed = json.loads(v)
+                    if isinstance(parsed, list):
+                        return [str(x).strip() for x in parsed if str(x).strip()]
+                except Exception:
+                    inner = v[1:-1]
+                    parts = [
+                        x.strip().strip("'\"") for x in inner.split(",") if x.strip().strip("'\"")
+                    ]
+                    if parts:
+                        return parts
+            return [x.strip().strip("'\"") for x in v.split(",") if x.strip().strip("'\"")]
+        return ["http://localhost:3000"]
 
     log_level: str = "INFO"
     """Nivel de logging raíz (DEBUG, INFO, WARNING, ERROR, CRITICAL)."""
